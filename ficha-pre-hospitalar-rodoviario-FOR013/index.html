@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ficha de Atendimento Pré-Hospitalar — MMS.BR.RV.FOR.013</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; font-size: 9px; background: #f0f0f0; }
+
+  .action-bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    background: #1a1a2e; padding: 10px 20px;
+    display: flex; gap: 10px; align-items: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  .action-bar span { color: #fff; font-size: 13px; font-weight: bold; margin-right: 10px; }
+  .btn {
+    padding: 8px 20px; border: none; border-radius: 5px;
+    cursor: pointer; font-size: 12px; font-weight: bold;
+    display: flex; align-items: center; gap: 6px; transition: all 0.2s;
+  }
+  .btn-pdf { background: #e63946; color: white; }
+  .btn-pdf:hover { background: #c1121f; }
+  .btn-print { background: #2196F3; color: white; }
+  .btn-print:hover { background: #1565C0; }
+
+  .page-wrapper { padding: 70px 20px 20px; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+
+  .form-page {
+    background: white; width: 210mm;
+    padding: 6mm 6mm; border: 1px solid #ccc;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+
+  .header-row {
+    display: grid; grid-template-columns: 80px 1fr auto;
+    border: 1px solid #000; margin-bottom: 0;
+  }
+  .logo-cell {
+    border-right: 1px solid #000; padding: 4px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logo-text { font-size: 18px; font-weight: 900; color: #c00; line-height: 1; }
+  .logo-sub { font-size: 7px; color: #555; }
+  .title-cell {
+    text-align: center; padding: 6px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .form-title { font-size: 13px; font-weight: 900; }
+  .code-cell {
+    border-left: 1px solid #000; padding: 4px 8px;
+    font-size: 8px; display: flex; flex-direction: column; justify-content: center;
+    text-align: right; white-space: nowrap;
+  }
+
+  table { width: 100%; border-collapse: collapse; }
+  td, th { border: 1px solid #000; padding: 2px 3px; vertical-align: top; font-size: 8.5px; }
+  .lbl { font-size: 7.5px; font-weight: bold; display: block; }
+
+  input[type="text"], input[type="date"], input[type="time"], input[type="number"], textarea {
+    width: 100%; border: none; outline: none; font-size: 8.5px;
+    font-family: Arial, sans-serif; background: transparent; resize: none;
+  }
+  textarea { min-height: 16px; }
+
+  .cb { display: flex; align-items: center; gap: 3px; font-size: 8.5px; white-space: nowrap; cursor: pointer; }
+  .cb input[type="checkbox"] { width: 11px; height: 11px; cursor: pointer; accent-color: #000; }
+
+  .section-header {
+    background: #000; color: #fff; text-align: center;
+    font-weight: bold; font-size: 9px; padding: 2px;
+  }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid #000; border-top: none; }
+  .col-block { padding: 3px; border-right: 1px solid #000; }
+  .col-block:last-child { border-right: none; }
+
+  .xabcde-grid { display: grid; grid-template-columns: 18px 1fr; border-top: 1px solid #000; }
+  .xabcde-letter { 
+    font-weight: bold; font-size: 10px; 
+    border-right: 1px solid #000; 
+    display: flex; align-items: center; justify-content: center;
+    border-bottom: 1px solid #000;
+  }
+  .xabcde-content { 
+    padding: 2px 4px; display: flex; align-items: flex-start; flex-wrap: wrap; gap: 3px;
+    border-bottom: 1px solid #000;
+  }
+
+  .glasgow-col { display: flex; flex-direction: column; gap: 1px; }
+  .glasgow-opt { display: flex; align-items: flex-start; gap: 2px; font-size: 8px; margin-bottom: 1px; }
+
+  /* Body diagram area */
+  .body-diagram { text-align: center; }
+  .body-svg { width: 120px; height: 180px; }
+
+  .gravidade-box { border: 1px solid #000; padding: 3px; }
+  .grav-row { display: flex; align-items: center; gap: 3px; margin-bottom: 2px; }
+  .grav-label { 
+    font-size: 8px; font-weight: bold; padding: 1px 4px; min-width: 50px; text-align: center;
+  }
+
+  .sinais-row { display: grid; grid-template-columns: repeat(5, 1fr); border: 1px solid #000; border-top: none; }
+  .sinais-cell { border-right: 1px solid #000; padding: 2px 3px; }
+  .sinais-cell:last-child { border-right: none; }
+
+  .materiais-grid {
+    display: grid; grid-template-columns: 30px 1fr 30px 1fr;
+    border-collapse: collapse;
+  }
+  .mat-cell {
+    border: 1px solid #000; border-top: none; border-right: none;
+    padding: 2px 3px; font-size: 8.5px;
+    display: flex; align-items: center; gap: 2px;
+  }
+  .mat-cell:nth-child(4n) { border-right: 1px solid #000; }
+
+  @media print {
+    .action-bar { display: none !important; }
+    .page-wrapper { padding: 0; background: white; }
+    .form-page { box-shadow: none; border: none; margin: 0; page-break-after: always; }
+    .form-page:last-child { page-break-after: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="action-bar">
+  <span>🚑 Ficha Pré-Hospitalar Rodoviário — MMS.BR.RV.FOR.013</span>
+  <button class="btn btn-pdf" onclick="savePDF()">⬇️ Salvar em PDF</button>
+  <button class="btn btn-print" onclick="window.print()">🖨️ Imprimir</button>
+</div>
+
+<div class="page-wrapper">
+
+<!-- ============ PÁGINA 1 ============ -->
+<div class="form-page" id="page1">
+
+  <!-- Header -->
+  <div class="header-row">
+    <div class="logo-cell">
+      <div>
+        <div class="logo-text">med<span style="font-size:22px">+</span></div>
+        <div class="logo-sub">Group</div>
+      </div>
+    </div>
+    <div class="title-cell">
+      <div class="form-title">FICHA DE ATENDIMENTO PRÉ-HOSPITALAR RODOVIÁRIO</div>
+    </div>
+    <div class="code-cell">
+      <div>MMS.BR.RV.FOR.013</div>
+    </div>
+  </div>
+
+  <!-- USB/USA/MR + Base/Nº/Data -->
+  <table>
+    <tr>
+      <td style="width:30%">
+        <div style="display:flex;gap:6px;align-items:center">
+          <label class="cb"><input type="checkbox"> USB</label>
+          <label class="cb"><input type="checkbox"> USA</label>
+          <label class="cb"><input type="checkbox"> MR</label>
+        </div>
+      </td>
+      <td><span class="lbl">BASE:</span><input type="text"></td>
+      <td><span class="lbl">Nº OC:</span><input type="text"></td>
+      <td><span class="lbl">DATA:</span><input type="date"></td>
+    </tr>
+  </table>
+
+  <!-- Horários -->
+  <table>
+    <tr>
+      <td><span class="lbl">Horário – Acionamento:</span><input type="time"></td>
+      <td><span class="lbl">na Ocorrência:</span><input type="time"></td>
+      <td><span class="lbl">da Saída:</span><input type="time"></td>
+      <td><span class="lbl">no Hosp:</span><input type="time"></td>
+      <td><span class="lbl">do Término:</span><input type="time"></td>
+      <td><span class="lbl">na Base:</span><input type="time"></td>
+    </tr>
+  </table>
+
+  <!-- Endereço -->
+  <table>
+    <tr>
+      <td colspan="2">
+        <span class="lbl">Endereço do atendimento:</span>
+        BR-<input type="text" style="width:40px;display:inline;border-bottom:1px solid #000">, Km <input type="text" style="width:50px;display:inline;border-bottom:1px solid #000">, Sentido <input type="text" style="width:60px;display:inline;border-bottom:1px solid #000">
+      </td>
+      <td colspan="2"><span class="lbl">Hospital de destino/Outro:</span><input type="text"></td>
+    </tr>
+    <tr>
+      <td colspan="2"><span class="lbl">Tipo de ocorrência:</span><input type="text"></td>
+      <td colspan="2"><span class="lbl">Médico / Enf no destino:</span><input type="text"></td>
+    </tr>
+  </table>
+
+  <!-- Identificação Paciente -->
+  <div class="section-header">IDENTIFICAÇÃO PACIENTE</div>
+  <table>
+    <tr>
+      <td colspan="5"><span class="lbl">Nome:</span><input type="text"></td>
+    </tr>
+    <tr>
+      <td><span class="lbl">Data de Nascimento:</span><input type="date"></td>
+      <td><span class="lbl">Gênero:</span><input type="text"></td>
+      <td><span class="lbl">Cor:</span><input type="text"></td>
+      <td><span class="lbl">CPF:</span><input type="text"></td>
+      <td><span class="lbl">RG:</span><input type="text"></td>
+    </tr>
+    <tr>
+      <td colspan="3"><span class="lbl">Endereço:</span><input type="text"></td>
+      <td><span class="lbl">CEP:</span><input type="text"></td>
+      <td><span class="lbl">Estado:</span><input type="text"></td>
+    </tr>
+    <tr>
+      <td colspan="2"><span class="lbl">Modelo Veículo:</span><input type="text"></td>
+      <td><span class="lbl">Cor Veículo:</span><input type="text"></td>
+      <td colspan="2"><span class="lbl">Placa Veículo:</span><input type="text"></td>
+    </tr>
+  </table>
+
+  <!-- Gravidade + Sistema de Proteção + Apoio -->
+  <table>
+    <tr>
+      <td style="width:20%">
+        <span class="lbl">Gravidade:</span>
+        <div style="margin-top:2px">
+          <label class="cb" style="margin-bottom:2px"><input type="checkbox"> <span style="background:#90ee90;padding:1px 4px;font-size:7.5px">Verde/Leve</span></label><br>
+          <label class="cb" style="margin-bottom:2px"><input type="checkbox"> <span style="background:#ffcc00;padding:1px 4px;font-size:7.5px">Amarelo/Moderado</span></label><br>
+          <label class="cb" style="margin-bottom:2px"><input type="checkbox"> <span style="background:#ff6b6b;padding:1px 4px;font-size:7.5px">Vermelho/Grave</span></label><br>
+          <label class="cb" style="margin-bottom:2px"><input type="checkbox"> <span style="background:#555;color:white;padding:1px 4px;font-size:7.5px">Cinza/Preto/morte evidente</span></label><br>
+          <label class="cb"><input type="checkbox"> Sem lesão aparente</label>
+        </div>
+      </td>
+      <td style="width:20%;border-left:1px solid #000">
+        <span class="lbl">START:</span>
+        <div style="border:2px solid #000;padding:2px;margin-top:2px;font-size:8px;min-height:20px">
+          <input type="text" placeholder="Triagem START...">
+        </div>
+      </td>
+      <td style="width:30%">
+        <span class="lbl">Sistema de proteção: SIM ou NÃO</span>
+        <div style="margin-top:2px">
+          <label class="cb" style="margin-bottom:2px"><input type="checkbox"> Cinto</label>
+          <label class="cb" style="margin-bottom:2px"><input type="checkbox"> Airbag</label>
+          <label class="cb"><input type="checkbox"> Capacete &nbsp; <label class="cb"><input type="checkbox"> Ignorado</label></label>
+        </div>
+      </td>
+      <td style="width:30%">
+        <span class="lbl">Apoio:</span>
+        <textarea style="min-height:45px"></textarea>
+      </td>
+    </tr>
+  </table>
+
+  <!-- Two-column: XABCDE + Lesões Aparentes -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;border:1px solid #000;border-top:none">
+
+    <!-- Coluna Esquerda: AVALIAÇÃO PRIMÁRIA XABCDE -->
+    <div style="border-right:1px solid #000">
+      <div class="section-header">AVALIAÇÃO PRIMÁRIA - XABCDE</div>
+      
+      <div style="display:grid;grid-template-columns:18px 1fr;border-top:1px solid #000">
+        <div style="display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:10px;border-right:1px solid #000;border-bottom:1px solid #000">X</div>
+        <div style="padding:2px 4px;border-bottom:1px solid #000">
+          <label class="cb"><input type="checkbox"> Hemorragia externa grave</label>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:18px 1fr;border-bottom:1px solid #000">
+        <div style="display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:10px;border-right:1px solid #000">A</div>
+        <div style="padding:2px 4px">
+          <label class="cb"><input type="checkbox"> Via aérea pérvea</label>
+          <label class="cb"><input type="checkbox"> Sangue/secreção</label>
+          <label class="cb"><input type="checkbox"> Via aérea obstruída</label>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:18px 1fr;border-bottom:1px solid #000">
+        <div style="display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:10px;border-right:1px solid #000">B</div>
+        <div style="padding:2px 4px">
+          <label class="cb"><input type="checkbox"> Cianose</label>
+          <label class="cb"><input type="checkbox"> Pneumotórax</label>
+          <label class="cb"><input type="checkbox"> Tórax instável</label>
+          <label class="cb"><input type="checkbox"> Insuf. respiratória</label>
+          <label class="cb"><input type="checkbox"> Hemotórax</label>
+          <label class="cb"><input type="checkbox"> Crepitação</label>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:18px 1fr;border-bottom:1px solid #000">
+        <div style="display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:10px;border-right:1px solid #000">C</div>
+        <div style="padding:2px 4px">
+          <label class="cb"><input type="checkbox"> TEC &lt; 2s</label>
+          <label class="cb"><input type="checkbox"> Pele quente</label>
+          <label class="cb"><input type="checkbox"> Pele seca</label>
+          <label class="cb"><input type="checkbox"> Pulso cheio</label>
+          <label class="cb"><input type="checkbox"> Pelve instável</label>
+          <label class="cb"><input type="checkbox"> TEC &gt; 2s</label>
+          <label class="cb"><input type="checkbox"> Pele fria</label>
+          <label class="cb"><input type="checkbox"> Pele úmida</label>
+          <label class="cb"><input type="checkbox"> Pulso fino</label>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:18px 1fr;border-bottom:1px solid #000">
+        <div style="display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:10px;border-right:1px solid #000">D</div>
+        <div style="padding:2px 4px">
+          <div style="display:flex;gap:4px;flex-wrap:wrap">
+            <label class="cb"><input type="checkbox"> Isocoria D</label>
+            <label class="cb"><input type="checkbox"> E</label>
+            <label class="cb"><input type="checkbox"> Foto reagentes</label>
+          </div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:2px">
+            <label class="cb"><input type="checkbox"> Anisocoria D</label>
+            <label class="cb"><input type="checkbox"> E</label>
+            <label class="cb"><input type="checkbox"> S/N Consciente</label>
+          </div>
+          <div style="margin-top:2px">
+            ECG: Σ <input type="text" style="width:40px;border-bottom:1px solid #000;display:inline">
+            &nbsp;AO <input type="text" style="width:20px;border-bottom:1px solid #000;display:inline">
+            RV <input type="text" style="width:20px;border-bottom:1px solid #000;display:inline">
+            RM <input type="text" style="width:20px;border-bottom:1px solid #000;display:inline">
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:18px 1fr">
+        <div style="display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:10px;border-right:1px solid #000">E</div>
+        <div style="padding:2px 4px">
+          <label class="cb"><input type="checkbox"> Hipotermia</label>
+          <label class="cb"><input type="checkbox"> Exposição</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Coluna Direita: LESÕES APARENTES -->
+    <div>
+      <div class="section-header">LESÕES APARENTES</div>
+      <div style="padding:4px;display:flex;gap:8px">
+        <!-- Body figure placeholder -->
+        <div style="text-align:center;min-width:100px">
+          <svg viewBox="0 0 80 160" width="80" height="150" xmlns="http://www.w3.org/2000/svg" style="border:1px solid #eee">
+            <!-- Head -->
+            <ellipse cx="40" cy="15" rx="12" ry="13" fill="none" stroke="#333" stroke-width="1.5"/>
+            <!-- Neck -->
+            <rect x="35" y="27" width="10" height="7" fill="none" stroke="#333" stroke-width="1.5"/>
+            <!-- Torso -->
+            <rect x="22" y="34" width="36" height="45" rx="3" fill="none" stroke="#333" stroke-width="1.5"/>
+            <!-- Left arm -->
+            <line x1="22" y1="36" x2="10" y2="55" stroke="#333" stroke-width="5" stroke-linecap="round"/>
+            <line x1="10" y1="55" x2="6" y2="78" stroke="#333" stroke-width="4" stroke-linecap="round"/>
+            <!-- Right arm -->
+            <line x1="58" y1="36" x2="70" y2="55" stroke="#333" stroke-width="5" stroke-linecap="round"/>
+            <line x1="70" y1="55" x2="74" y2="78" stroke="#333" stroke-width="4" stroke-linecap="round"/>
+            <!-- Left leg -->
+            <line x1="33" y1="79" x2="28" y2="115" stroke="#333" stroke-width="6" stroke-linecap="round"/>
+            <line x1="28" y1="115" x2="25" y2="150" stroke="#333" stroke-width="5" stroke-linecap="round"/>
+            <!-- Right leg -->
+            <line x1="47" y1="79" x2="52" y2="115" stroke="#333" stroke-width="6" stroke-linecap="round"/>
+            <line x1="52" y1="115" x2="55" y2="150" stroke="#333" stroke-width="5" stroke-linecap="round"/>
+          </svg>
+          <div style="font-size:7px;margin-top:2px">Marque as lesões</div>
+        </div>
+        <!-- Legend -->
+        <div style="font-size:8px;flex:1">
+          <div>1 - Contusão</div>
+          <div>2 - Escoriação</div>
+          <div>3 - Corte</div>
+          <div>4 - Laceração</div>
+          <div>5 - Luxação</div>
+          <div>6 - Suspeita de fratura fechada</div>
+          <div>7 - Fratura exposta</div>
+          <div>8 - Arma de fogo</div>
+          <div>9 - Arma branca</div>
+          <div>10 - Perfurante</div>
+          <div>11 - Abrasão</div>
+          <div>12 - Amputação / Avulsão</div>
+          <div>13 - Esmagamento</div>
+          <div>14 - Outros: <input type="text" style="width:60px;border-bottom:1px solid #000"></div>
+          <div style="margin-top:4px">
+            <span class="lbl">Lesão (nº):</span>
+            <input type="text" placeholder="ex: 1,3,7">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Avaliação Secundária -->
+  <div class="section-header">AVALIAÇÃO SECUNDÁRIA</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;border:1px solid #000;border-top:none">
+    <div style="border-right:1px solid #000">
+      <!-- Sinais Vitais -->
+      <div style="display:flex;gap:4px;padding:3px;border-bottom:1px solid #000;flex-wrap:wrap">
+        <b>SINAIS VITAIS</b>
+        PA: <input type="text" style="width:45px;border-bottom:1px solid #000">
+        FC: <input type="text" style="width:35px;border-bottom:1px solid #000">
+        FR: <input type="text" style="width:35px;border-bottom:1px solid #000">
+        T: <input type="text" style="width:30px;border-bottom:1px solid #000">
+        StO2: <input type="text" style="width:30px;border-bottom:1px solid #000">
+      </div>
+      <!-- SAMPLE -->
+      <table style="border:none">
+        <tr><td style="border:none;border-bottom:1px solid #000;width:20px"><b>S:</b></td><td style="border:none;border-bottom:1px solid #000"><textarea style="min-height:16px"></textarea></td></tr>
+        <tr><td style="border:none;border-bottom:1px solid #000"><b>A:</b></td><td style="border:none;border-bottom:1px solid #000"><textarea style="min-height:16px"></textarea></td></tr>
+        <tr><td style="border:none;border-bottom:1px solid #000"><b>M:</b></td><td style="border:none;border-bottom:1px solid #000"><textarea style="min-height:16px"></textarea></td></tr>
+        <tr><td style="border:none;border-bottom:1px solid #000"><b>P:</b></td><td style="border:none;border-bottom:1px solid #000"><textarea style="min-height:16px"></textarea></td></tr>
+        <tr><td style="border:none;border-bottom:1px solid #000"><b>L:</b></td><td style="border:none;border-bottom:1px solid #000"><textarea style="min-height:16px"></textarea></td></tr>
+        <tr><td style="border:none"><b>A:</b></td><td style="border:none"><textarea style="min-height:16px"></textarea></td></tr>
+      </table>
+    </div>
+
+    <!-- Coluna direita: Tipo de acidente, Glasgow, etc. -->
+    <div style="padding:3px">
+      <!-- Tipo de Acidente -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:4px">
+        <div>
+          <div style="font-weight:bold;font-size:8px;text-align:center;background:#eee;padding:1px">TIPO DE ACIDENTE</div>
+          <div style="font-size:7.5px">
+            <label class="cb"><input type="checkbox"> Colisão frontal</label>
+            <label class="cb"><input type="checkbox"> Colisão traseira</label>
+            <label class="cb"><input type="checkbox"> Colisão lateral</label>
+            <label class="cb"><input type="checkbox"> Capotagem</label>
+            <label class="cb"><input type="checkbox"> Queda de moto</label>
+            <label class="cb"><input type="checkbox"> Queda de bicicleta</label>
+            <label class="cb"><input type="checkbox"> Atropelamento de pedestre</label>
+            <label class="cb"><input type="checkbox"> Choque contra objeto fixo</label>
+            <label class="cb"><input type="checkbox"> Atropelamento de animal</label>
+            <label class="cb"><input type="checkbox"> Andarilho</label>
+            <label class="cb"><input type="checkbox"> Usuário</label>
+          </div>
+        </div>
+        <div>
+          <div style="font-weight:bold;font-size:8px;text-align:center;background:#eee;padding:1px">ACIDENTE ESPECÍFICO</div>
+          <label class="cb"><input type="checkbox"> Veículo elétrico</label>
+          <label class="cb"><input type="checkbox"> Veículo híbrido</label>
+          <div style="font-size:7.5px;margin-top:3px"><b>Neutralização da bateria:</b></div>
+          <div style="display:flex;gap:4px">
+            <label class="cb"><input type="checkbox"> SIM</label>
+            <label class="cb"><input type="checkbox"> NÃO</label>
+          </div>
+          <div style="margin-top:4px;font-size:7.5px">
+            <b>PRODUTO PERIGOSO</b><br>
+            Nº ONU: <input type="text" style="border-bottom:1px solid #000"><br>
+            Classes: <input type="text" style="border-bottom:1px solid #000">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mecanismo de Trauma + Glasgow -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;border:1px solid #000;border-top:none">
+    <div style="border-right:1px solid #000;padding:3px">
+      <div style="font-weight:bold;font-size:8.5px;text-align:center;background:#eee;margin-bottom:3px">MECANISMO DE TRAUMA</div>
+      <div style="font-size:8px">
+        <label class="cb"><input type="checkbox"> Quedas com mais de 03 metros</label>
+        <label class="cb"><input type="checkbox"> Queda de crianças com mais de 3x a estatura</label>
+        <label class="cb"><input type="checkbox"> Intrusão veicular com mais de 30 cm</label>
+        <label class="cb"><input type="checkbox"> Ejeção de ocupante</label>
+        <label class="cb"><input type="checkbox"> Capotagem com ou sem ejeção</label>
+        <label class="cb"><input type="checkbox"> Morte de um ocupante</label>
+        <label class="cb"><input type="checkbox"> Vítima em submersão em líquido</label>
+        <label class="cb"><input type="checkbox"> Queda de escada (mais de 5 degraus)</label>
+        <label class="cb"><input type="checkbox"> Colisão em alta velocidade</label>
+        <label class="cb"><input type="checkbox"> Queda de moto com alta velocidade</label>
+        <label class="cb"><input type="checkbox"> Atropelamento com impacto significativo</label>
+        <label class="cb"><input type="checkbox"> Explosões</label>
+        <label class="cb"><input type="checkbox"> Queimaduras</label>
+        <label class="cb"><input type="checkbox"> Inalação de gases tóxicos</label>
+        <label class="cb"><input type="checkbox"> Ferimento por projétil de arma de fogo</label>
+        <label class="cb"><input type="checkbox"> Ferimento por arma branca ou trauma penetrante</label>
+      </div>
+    </div>
+    <div style="padding:3px">
+      <div style="font-weight:bold;font-size:8.5px;text-align:center;background:#eee;margin-bottom:3px">ESCALA DE COMA DE GLASGOW</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;font-size:8px">
+        <div>
+          <b>ABERTURA OCULAR</b>
+          <label class="cb"><input type="radio" name="ao"> (1) Não abre</label>
+          <label class="cb"><input type="radio" name="ao"> (2) Estímulo doloroso</label>
+          <label class="cb"><input type="radio" name="ao"> (3) Estímulo verbal</label>
+          <label class="cb"><input type="radio" name="ao"> (4) Espontaneamente</label>
+        </div>
+        <div>
+          <b>RESPOSTA VERBAL</b>
+          <label class="cb"><input type="radio" name="rv"> (1) Não fala</label>
+          <label class="cb"><input type="radio" name="rv"> (2) Sons incompreensíveis</label>
+          <label class="cb"><input type="radio" name="rv"> (3) Palavras inapropriadas</label>
+          <label class="cb"><input type="radio" name="rv"> (4) Confuso</label>
+          <label class="cb"><input type="radio" name="rv"> (5) Orientado</label>
+        </div>
+        <div>
+          <b>RESPOSTA MOTORA</b>
+          <label class="cb"><input type="radio" name="rm"> (1) Não mexe</label>
+          <label class="cb"><input type="radio" name="rm"> (2) Descerebração</label>
+          <label class="cb"><input type="radio" name="rm"> (3) Decorticação</label>
+          <label class="cb"><input type="radio" name="rm"> (4) Retirada</label>
+          <label class="cb"><input type="radio" name="rm"> (5) Localiza a dor</label>
+          <label class="cb"><input type="radio" name="rm"> (6) Obedece a comando</label>
+        </div>
+      </div>
+      <div style="margin-top:4px;font-size:8.5px">
+        <b>TOTAL DA ESCALA DE GLASGOW:</b> <input type="number" min="3" max="15" style="width:50px;border-bottom:1px solid #000">
+      </div>
+    </div>
+  </div>
+
+  <!-- Sinais complementares + Veículos + Salvamento -->
+  <div style="display:grid;grid-template-columns:1fr 2fr 1fr;border:1px solid #000;border-top:none">
+    <div style="border-right:1px solid #000;padding:3px">
+      <div style="font-size:8px">
+        SATO2 <input type="text" style="width:40px;border-bottom:1px solid #000"> %<br>
+        FR <input type="text" style="width:40px;border-bottom:1px solid #000"> IPM<br>
+        FC <input type="text" style="width:40px;border-bottom:1px solid #000"> BPM<br>
+        PA <input type="text" style="width:40px;border-bottom:1px solid #000"> MMHG<br>
+        PERF CAP <input type="text" style="width:30px;border-bottom:1px solid #000"> S<br>
+        DEXTRO <input type="text" style="width:35px;border-bottom:1px solid #000"> MG/DL<br>
+        ETCO2 <input type="text" style="width:35px;border-bottom:1px solid #000">
+      </div>
+    </div>
+    <div style="border-right:1px solid #000;padding:3px">
+      <div style="font-weight:bold;font-size:8px;text-align:center;background:#eee;margin-bottom:2px">VEÍCULOS ENVOLVIDOS — (ANOTE A QUANTIDADE)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;font-size:8px">
+        <div>
+          <label class="cb"><input type="checkbox"> Automóveis <input type="number" min="0" style="width:25px;border-bottom:1px solid #000"></label>
+          <label class="cb"><input type="checkbox"> Caminhões <input type="number" min="0" style="width:25px;border-bottom:1px solid #000"></label>
+          <label class="cb"><input type="checkbox"> Carretas <input type="number" min="0" style="width:25px;border-bottom:1px solid #000"></label>
+          <label class="cb"><input type="checkbox"> Motos <input type="number" min="0" style="width:25px;border-bottom:1px solid #000"></label>
+        </div>
+        <div>
+          <label class="cb"><input type="checkbox"> Scooter <input type="number" min="0" style="width:25px;border-bottom:1px solid #000"></label>
+          <label class="cb"><input type="checkbox"> Vans <input type="number" min="0" style="width:25px;border-bottom:1px solid #000"></label>
+          <label class="cb"><input type="checkbox"> Utilitários <input type="number" min="0" style="width:25px;border-bottom:1px solid #000"></label>
+          <label class="cb"><input type="checkbox"> Bicicleta <input type="number" min="0" style="width:25px;border-bottom:1px solid #000"></label>
+        </div>
+      </div>
+      <div style="font-size:8px;margin-top:3px">
+        Total de vítimas envolvidas: <input type="number" min="0" style="width:40px;border-bottom:1px solid #000">
+      </div>
+    </div>
+    <div style="padding:3px;font-size:8px">
+      <b>SALVAMENTO VEICULAR</b><br>
+      Posição da vítima:<br><input type="text" style="border-bottom:1px solid #000"><br>
+      Tipo físico:<br><input type="text" style="border-bottom:1px solid #000"><br>
+      Encarceramento mecânico:
+      <label class="cb"><input type="checkbox"> SIM</label>
+      <label class="cb"><input type="checkbox"> NÃO</label>
+      Tempo: <input type="text" style="border-bottom:1px solid #000"><br>
+      Ângulo de extração: <input type="text" style="border-bottom:1px solid #000">
+    </div>
+  </div>
+
+  <div style="text-align:center;font-size:8px;margin-top:6px;color:#555">Página 1 de 2 — MMS.BR.RV.FOR.013</div>
+</div>
+
+<!-- ============ PÁGINA 2 ============ -->
+<div class="form-page" id="page2">
+
+  <!-- Header repetido -->
+  <div class="header-row">
+    <div class="logo-cell">
+      <div>
+        <div class="logo-text">med<span style="font-size:22px">+</span></div>
+        <div class="logo-sub">Group</div>
+      </div>
+    </div>
+    <div class="title-cell">
+      <div class="form-title">FICHA DE ATENDIMENTO PRÉ-HOSPITALAR RODOVIÁRIO</div>
+    </div>
+    <div class="code-cell">
+      <div>MMS.BR.RV.FOR.013</div>
+    </div>
+  </div>
+
+  <!-- Exame da Cabeça aos Pés -->
+  <div class="section-header">EXAME DA CABEÇA AOS PÉS</div>
+  <table>
+    <tr><td style="width:100px;font-weight:bold">Cabeça</td><td><textarea style="min-height:28px"></textarea></td></tr>
+    <tr><td style="font-weight:bold">Pescoço</td><td><textarea style="min-height:28px"></textarea></td></tr>
+    <tr><td style="font-weight:bold">Tórax</td><td><textarea style="min-height:28px"></textarea></td></tr>
+    <tr><td style="font-weight:bold">Abdome</td><td><textarea style="min-height:28px"></textarea></td></tr>
+    <tr><td style="font-weight:bold">Pelve/Quadril</td><td><textarea style="min-height:28px"></textarea></td></tr>
+    <tr><td style="font-weight:bold">Membro Superior</td><td><textarea style="min-height:28px"></textarea></td></tr>
+    <tr><td style="font-weight:bold">Membro Inferior</td><td><textarea style="min-height:28px"></textarea></td></tr>
+  </table>
+
+  <!-- Evolução -->
+  <div class="section-header">EVOLUÇÃO</div>
+  <table>
+    <tr><td style="height:130px"><textarea style="min-height:125px;width:100%"></textarea></td></tr>
+  </table>
+
+  <!-- Materiais Utilizados -->
+  <div class="section-header">MATERIAIS UTILIZADOS</div>
+  <table>
+    <tr style="background:#eee">
+      <th style="width:5%">Nº</th>
+      <th style="width:45%">Material</th>
+      <th style="width:5%">Nº</th>
+      <th style="width:45%">Material</th>
+    </tr>
+    <tr><td>1.</td><td><input type="text"></td><td>8.</td><td><input type="text"></td></tr>
+    <tr><td>2.</td><td><input type="text"></td><td>9.</td><td><input type="text"></td></tr>
+    <tr><td>3.</td><td><input type="text"></td><td>10.</td><td><input type="text"></td></tr>
+    <tr><td>4.</td><td><input type="text"></td><td>11.</td><td><input type="text"></td></tr>
+    <tr><td>5.</td><td><input type="text"></td><td>12.</td><td><input type="text"></td></tr>
+    <tr><td>6.</td><td><input type="text"></td><td>13.</td><td><input type="text"></td></tr>
+    <tr><td>7.</td><td><input type="text"></td><td>14.</td><td><input type="text"></td></tr>
+  </table>
+
+  <!-- Equipe + Recusa -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;border:1px solid #000;border-top:none">
+    <div style="border-right:1px solid #000;padding:4px">
+      <div style="font-weight:bold;font-size:9px;text-align:center;background:#eee;margin-bottom:4px;padding:2px">EQUIPE</div>
+      <div style="font-size:8.5px">
+        Médico: <input type="text" style="border-bottom:1px solid #000;margin-bottom:6px"><br>
+        Enfermeiro: <input type="text" style="border-bottom:1px solid #000;margin-bottom:6px"><br>
+        Socorrista 1: <input type="text" style="border-bottom:1px solid #000;margin-bottom:4px"><br>
+        Socorrista 2: <input type="text" style="border-bottom:1px solid #000;margin-bottom:4px"><br>
+        Socorrista 3: <input type="text" style="border-bottom:1px solid #000;margin-bottom:4px">
+      </div>
+      <div style="margin-top:6px;text-align:center;font-size:8px;font-weight:bold">Carimbo</div>
+      <div style="border:1px solid #aaa;min-height:45px;margin-top:2px"></div>
+    </div>
+    <div style="padding:4px">
+      <div style="font-weight:bold;font-size:9px;text-align:center;background:#eee;margin-bottom:4px;padding:2px">RECUSA ATENDIMENTO/TRANSPORTE</div>
+      <div style="display:flex;gap:8px;margin-bottom:6px">
+        <div>
+          <div style="font-size:8px;font-weight:bold;margin-bottom:2px">Vítima</div>
+          <div style="border:1px solid #000;min-height:28px;min-width:60px"></div>
+        </div>
+        <div>
+          <div style="font-size:8px;font-weight:bold;margin-bottom:2px">Responsável</div>
+          <div style="border:1px solid #000;min-height:28px;min-width:60px"></div>
+        </div>
+      </div>
+      <div style="font-size:8.5px">
+        Nome: <input type="text" style="border-bottom:1px solid #000;margin-bottom:4px"><br>
+        Assinatura:
+        <div style="border-bottom:1px solid #000;min-height:25px;margin-top:2px"></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;font-size:8px;margin-top:6px;color:#555">Página 2 de 2 — MMS.BR.RV.FOR.013</div>
+</div>
+
+</div><!-- end page-wrapper -->
+
+<script>
+function savePDF() {
+  const bar = document.querySelector('.action-bar');
+  bar.style.display = 'none';
+  const wrapper = document.querySelector('.page-wrapper');
+  wrapper.style.padding = '0';
+
+  const opt = {
+    margin: 0,
+    filename: 'FOR013_Ficha_Atendimento_PreHospitalar_Rodoviario.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak: { mode: ['css', 'legacy'], before: '#page2' }
+  };
+
+  html2pdf().set(opt).from(wrapper).save().then(() => {
+    bar.style.display = 'flex';
+    wrapper.style.padding = '70px 20px 20px';
+  });
+}
+</script>
+
+</body>
+</html>
